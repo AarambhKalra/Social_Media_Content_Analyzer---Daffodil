@@ -1,0 +1,6 @@
+streamlit
+PyMuPDF
+google-genai
+pytest
+pytesseract
+Pillow
