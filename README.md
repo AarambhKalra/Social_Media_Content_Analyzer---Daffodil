@@ -2,6 +2,9 @@
 
 A Streamlit application that analyzes social media posts and suggests engagement improvements using AI-powered content analysis.
 
+## URL
+https://socialmediacontentanalyzer-daffodil.streamlit.app/
+
 ## Features
 
 ### 1. Document Upload
