@@ -3,6 +3,8 @@ import re
 from typing import Optional 
 
 from google import genai 
+from PIL import Image 
+import io 
 
 
 
@@ -137,3 +139,44 @@ max_tokens :int =512 ,
     "suggestions":suggestions ,
     "full_response":result_text 
     }
+
+
+def extract_text_from_image(
+    image_bytes: bytes,
+    model: str = DEFAULT_MODEL,
+    max_tokens: int = 1024,
+) -> str:
+    """Extract text from an image using Gemini vision model.
+
+    - Reads `GEMINI_API_KEY` from the environment.
+    - Returns the extracted text as a string.
+    - On any configuration/network/API error, an exception is raised.
+    """
+    if not image_bytes:
+        raise ValueError("Image bytes are required for text extraction")
+
+    client = _get_gemini_client()
+
+    # Open the image with PIL to ensure it's valid
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+    except Exception as e:
+        raise ValueError(f"Invalid image: {e}")
+
+    prompt = "Extract all visible text from this image. Return only the text, without any additional comments or formatting."
+
+    response = client.models.generate_content(
+        model=model,
+        contents=[prompt, image],
+        config={
+            "max_output_tokens": max_tokens,
+            "temperature": 0.0,  # Low temperature for accurate extraction
+        },
+    )
+
+    result_text = getattr(response, "text", "") or ""
+    result_text = result_text.strip()
+    if not result_text:
+        raise RuntimeError("Gemini did not return any extracted text")
+
+    return result_text
