@@ -1,7 +1,16 @@
 import fitz 
 from PIL import Image 
+import pytesseract 
 import io 
-from gemini_client import extract_text_from_image
+
+# Set the path to tesseract executable - will be auto-detected on most systems
+# On Windows, it might be at 'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# On Linux/Mac, it's usually in PATH
+try:
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+except:
+    # On deployment platforms, Tesseract should be in PATH
+    pass
 
 
 class TextExtractor :
@@ -21,10 +30,13 @@ class TextExtractor :
 
     @staticmethod 
     def extract_from_image (file ):
-        """Extract text from image files using Gemini OCR."""
+        """Extract text from image files using OCR (Tesseract)."""
         try :
-            image_bytes = file.read()
-            text = extract_text_from_image(image_bytes)
+
+            image =Image .open (io .BytesIO (file .read ()))
+
+
+            text =pytesseract .image_to_string (image )
             return text .strip ()
         except Exception as e :
             raise ValueError (f"OCR extraction failed: {e }")
