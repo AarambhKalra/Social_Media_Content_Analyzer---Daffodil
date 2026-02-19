@@ -24,7 +24,17 @@ def _get_tesseract_cmd():
         # If not found, let pytesseract try to find it
         return None
     else:
-        # On Linux/Mac, assume it's in PATH
+        # On Linux/Mac, check common installation paths
+        possible_paths = [
+            '/usr/bin/tesseract',
+            '/usr/local/bin/tesseract',
+            '/usr/share/tesseract-ocr/tesseract',
+            '/opt/homebrew/bin/tesseract'  # macOS with Homebrew
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                return path
+        # If not found, assume it's in PATH
         return None
 
 
@@ -56,14 +66,17 @@ class TextExtractor :
             # Check if tesseract is available
             try:
                 version = pytesseract.get_tesseract_version()
-            except Exception:
-                raise ValueError("Tesseract OCR is not installed or not accessible. Please install Tesseract OCR and ensure it's in your PATH, or check the README for installation instructions.")
+            except Exception as version_error:
+                # Try to proceed anyway, as sometimes version check fails but OCR works
+                print(f"Warning: Tesseract version check failed ({version_error}), attempting OCR anyway...")
             
             # Reset file pointer in case it was read before
             file.seek(0)
             image =Image .open (io .BytesIO (file .read ()))
 
             text =pytesseract .image_to_string (image )
+            if not text.strip():
+                raise ValueError("No text was extracted from the image. The image may not contain readable text, or OCR quality is poor.")
             return text .strip ()
         except Exception as e :
             raise ValueError (f"OCR extraction failed: {e }")
