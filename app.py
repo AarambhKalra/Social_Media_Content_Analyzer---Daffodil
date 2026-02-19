@@ -67,3 +67,10 @@ if uploaded_file :
         else :
             st .info ("Analysis section is empty.")
 
+        st .subheader ("💡 Engagement Suggestions")
+        suggestions_text =analysis_result .get ("suggestions","No suggestions available.")
+        if suggestions_text :
+            st .write (suggestions_text )
+        else :
+            st .info ("Suggestions section is empty.")
+

@@ -3,6 +3,9 @@ from PIL import Image
 import pytesseract 
 import io 
 
+# Set the path to tesseract executable
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 class TextExtractor :
     """Text extractor supporting PDFs and images (with OCR)."""
